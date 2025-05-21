@@ -63,18 +63,4 @@ class HomepageController extends Controller
             'title'=>'Checkout'
         ]);
     }
-
-    public function login()
-    {
-        return view('web.login',[
-            'title'=>'Login'
-        ]);
-    }
-
-    public function register()
-    {
-        return view('web.register',[
-            'title'=>'Register'
-        ]);
-    }
 }
