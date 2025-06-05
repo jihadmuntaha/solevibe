@@ -5,18 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 
+use App\Models\Theme;
+
 class CustomerAuthController extends Controller
 {
+    private $themeFolder;
+
+    public function __construct()
+    {
+        $theme = Theme::where('status', 'active')->first();
+        if ($theme) {
+            $this->themeFolder = $theme->folder;
+        } else {
+            $this->themeFolder = 'default';
+        }
+    }
+
     public function login()
     {
-        return view('web.customer.login',[
+        return view($this->themeFolder.'.customer.login',[
             'title'=>'Login'
         ]);
     }
 
     public function register()
     {
-        return view('web.customer.register',[
+        return view($this->themeFolder.'.customer.register',[
             'title'=>'Register'
         ]);
     }

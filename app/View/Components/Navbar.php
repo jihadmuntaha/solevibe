@@ -11,9 +11,11 @@ class Navbar extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public $themeFolder;
+
+    public function __construct($themeFolder)
     {
-        //
+        $this->themeFolder = $themeFolder;
     }
 
     /**
@@ -21,6 +23,6 @@ class Navbar extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.navbar');
+        return view($this->themeFolder.'.components.navbar');
     }
 }

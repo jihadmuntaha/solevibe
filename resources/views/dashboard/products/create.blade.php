@@ -6,7 +6,9 @@
     </div>
 
     @if(session()->has('successMessage'))
-        <flux:badge color="lime" class="mb-3 w-full">{{session()->get('successMessage')}}</flux:badge>
+        <div class="mb-3 w-full rounded bg-lime-100 border border-lime-400 text-lime-800 px-4 py-3">
+            {{ session()->get('successMessage') }}
+        </div>
     @elseif(session()->has('errorMessage'))
         <flux:badge color="red" class="mb-3 w-full">{{session()->get('errorMessage')}}</flux:badge>
     @endif

@@ -8,7 +8,7 @@
 </head>
 <body>
   
-   <x-navbar></x-navbar>
+   <x-navbar themeFolder="{{ $themeFolder }}"></x-navbar>
 
    <div class="container-fluid py-4">
        {{  $slot }}

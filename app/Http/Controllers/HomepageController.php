@@ -5,14 +5,27 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Categories;
+use App\Models\Theme;
 
 class HomepageController extends Controller
 {
+    private $themeFolder;
+
+    public function __construct()
+    {
+        $theme = Theme::where('status', 'active')->first();
+        if ($theme) {
+            $this->themeFolder = $theme->folder;
+        } else {
+            $this->themeFolder = 'default';
+        }
+    }
+
     public function index()
     {
-        $categories = Categories::all();
+        $categories = Categories::latest()->take(4)->get();
         
-        return view('web.homepage',[
+        return view($this->themeFolder.'.homepage',[
             'categories' => $categories,
             'title'=>'Homepage'
         ]);
@@ -22,20 +35,20 @@ class HomepageController extends Controller
     {
         $title = "Products";
 
-        return view('web.products',[
+        return view($this->themeFolder.'.products',[
             'title'=>$title
         ]);
     }
 
     public function product($slug){
-        return view('web.product', [
+        return view($this->themeFolder.'.product', [
             'slug' => $slug
         ]);
     }
 
     public function categories()
     {
-        return view('web.categories',[
+        return view($this->themeFolder.'.categories',[
             'title'=>'Categories'
         ]);
     }
@@ -44,7 +57,7 @@ class HomepageController extends Controller
     {
         $category = Categories::find($slug);
 
-        return view('web.category_by_slug', [
+        return view($this->themeFolder.'.category_by_slug', [
             'slug' => $slug, 
             'category' => $category
         ]);
@@ -52,14 +65,14 @@ class HomepageController extends Controller
 
     public function cart()
     {
-        return view('web.cart',[
+        return view($this->themeFolder.'.cart',[
             'title'=>'Cart'
         ]);
     }
 
     public function checkout()
     {
-        return view('web.checkout',[
+        return view($this->themeFolder.'.checkout',[
             'title'=>'Checkout'
         ]);
     }

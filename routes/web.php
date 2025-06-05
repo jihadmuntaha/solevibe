@@ -7,6 +7,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\ThemeController;
+
+use App\Http\Controllers\OrderController;
+
+use App\Http\Controllers\ApiController;
 
 //kode baru diubah menjadi seperti ini
 Route::get('/', [HomepageController::class, 'index'])->name('home');
@@ -16,6 +21,8 @@ Route::get('categories',[HomepageController::class, 'categories']);
 Route::get('category/{slug}', [HomepageController::class, 'category']);
 Route::get('cart', [HomepageController::class, 'cart']);
 Route::get('checkout', [HomepageController::class, 'checkout']);
+
+Route::get('get-api-data', [ApiController::class, 'getApiData'])->name('get.api.data');
 
 Route::group(['prefix'=>'customer'], function(){
     Route::controller(CustomerAuthController::class)->group(function(){
@@ -47,6 +54,7 @@ Route::group(['prefix'=>'dashboard','middleware'=>['auth','verified']], function
 
     Route::resource('categories',ProductCategoryController::class);
     Route::resource('products',ProductController::class);
+    Route::resource('themes', ThemeController::class);
 
 });
 
