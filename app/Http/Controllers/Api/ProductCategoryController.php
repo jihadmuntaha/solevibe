@@ -12,9 +12,9 @@ class ProductCategoryController extends Controller
 {
     public function index()
     {
-        $categories = Categories::latest()->paginate(10);
+        $categories = Categories::latest()->paginate(2);
 
-        return new ProductCategoryResource($categories, 200, 'List Data Product Category', );
+        return new ProductCategoryResource($categories, 200, 'List Data Product Category');
     }
 
     public function store(Request $request)
