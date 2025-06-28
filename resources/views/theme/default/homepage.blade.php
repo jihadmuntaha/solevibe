@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot name="title"> Beranda</x-slot>
+    <x-slot name="title"> Homepage</x-slot>
 
     <div class="container py-3">
         <div class="d-flex justify-content-between align-items-center mb-4">

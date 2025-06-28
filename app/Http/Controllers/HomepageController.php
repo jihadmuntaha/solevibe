@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Categories;
 use App\Models\Product;
-use App\Models\Theme;
 
+use App\Models\Theme;
 use \Binafy\LaravelCart\Models\Cart;
 
 class HomepageController extends Controller
@@ -20,7 +20,7 @@ class HomepageController extends Controller
         if ($theme) {
             $this->themeFolder = $theme->folder;
         } else {
-            $this->themeFolder = 'default';
+            $this->themeFolder = 'web';
         }
     }
 

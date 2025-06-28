@@ -1,6 +1,15 @@
 <x-layout>
     <x-slot name="title">Keranjang Belanja</x-slot>
 
+    @if(session('success'))
+        <div class="container mt-4">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    @endif
+
     <div class="container my-5">
         <h1 class="mb-4">Keranjang Belanja</h1>
 
@@ -31,7 +40,10 @@
                                         <form action="{{ route('cart.remove', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari keranjang?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                <i class="bi bi-trash"></i> 
+                                                Hapus
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
