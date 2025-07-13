@@ -3,15 +3,20 @@
 
     <div class="container py-3">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 style="font-size: 1.5rem;">Kategori Product</h3>
+            <h3 style="font-size: 1.5rem;">Kategori Produk</h3>
         </div>
+
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
             @foreach($categories as $category)
                 <div class="col">
-                    <a href="{{ URL::to('/category/'.$category->slug) }}" class="card text-decoration-none">
+                    <a href="{{ url('/category/'.$category->slug) }}" class="card text-decoration-none">
                         <div class="card category-card text-center h-100 py-3 border-0 shadow-sm">
-                            <div class="mx-auto mb-2" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;border-radius:50%;">
-                                <img src="{{ $category->image }}" alt="{{ $category->name }}" style="width:36px;height:36px;object-fit:contain;">
+                            <div class="mx-auto mb-2"
+                                 style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;border-radius:50%;">
+                                <img
+                                    src="{{ $category->image ? Storage::url($category->image) : 'https://via.placeholder.com/64?text=No+Image' }}"
+                                    alt="{{ $category->name }}"
+                                    style="width:36px;height:36px;object-fit:contain;">
                             </div>
                             <div class="card-body p-2">
                                 <h6 class="card-title mb-1 text-dark">{{ $category->name }}</h6>
@@ -27,5 +32,4 @@
             {{ $categories->links('vendor.pagination.simple-bootstrap-5') }}
         </div>
     </div>
-
 </x-layout>

@@ -63,7 +63,7 @@
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p class="text-gray-900 whitespace-no-wrap">
                                 @if($category->image)
-                                    <img src="{{ $category->image }}" alt="{{ $category->name }}" class="h-10 w-10 object-cover rounded">
+                                   <img src="{{ Storage::url($category->image) }}" alt="{{ $category->name }}" class="h-10 w-10 object-cover rounded">
                                 @else
                                     <div class="h-10 w-10 bg-gray-200 flex items-center justify-center rounded">
                                         <span class="text-gray-500 text-sm">N/A</span>

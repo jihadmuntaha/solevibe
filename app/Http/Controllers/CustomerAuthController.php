@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
-
-use App\Models\Theme;
+use App\Models\Theme; // Pastikan ini di-import
 
 class CustomerAuthController extends Controller
 {
@@ -23,18 +22,21 @@ class CustomerAuthController extends Controller
 
     public function login()
     {
-        return view($this->themeFolder.'.customer.login',[
+        // Ubah baris ini:
+        return view('theme.' . $this->themeFolder . '.customer.login',[
             'title'=>'Login'
         ]);
     }
 
     public function register()
     {
-        return view($this->themeFolder.'.customer.register',[
+        // Ubah baris ini:
+        return view('theme.' . $this->themeFolder . '.customer.register',[
             'title'=>'Register'
         ]);
     }
 
+    // Metode store_register, store_login, dan logout tetap sama
     public function store_register(Request $request)
     {
         $validasi = \Validator::make($request->all(), [
@@ -89,7 +91,7 @@ class CustomerAuthController extends Controller
         } else {
             return redirect()->back()
                 ->with('errorMessage', 'Email atau password salah')
-                ->withInput();
+                ->with('oldInput', $request->except('password')); // Simpan input lama kecuali password
         }
     }
 

@@ -1,7 +1,10 @@
 <div>
-    <nav class="navbar navbar-expand-lg p-3" style="background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);">
+    <nav class="navbar navbar-expand-lg p-3" style="background: linear-gradient(90deg, #000000ff 0%, #000000ff 100%);">
         <div class="container">
-            <a class="navbar-brand text-white" href="/">E-Commerce</a>
+            <a class="navbar-brand text-white d-flex align-items-center" href="/">
+                <img src="{{ asset('theme/hexashop/assets/images/logo1-removebg-preview.png') }}" alt="SoleVibe Logo" style="height: 40px; margin-right: 20px;">
+                SoleVibe
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -20,26 +23,28 @@
 
                 <x-cart-icon></x-cart-icon>
                 
-                @if(auth()->guard('customer')->check())
-                    <div class="dropdown">
-                        <a class="btn btn-outline-light dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ Auth::guard('customer')->user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="#">Dashboard</a></li>
-                            <li>
-                                <form method="POST" action="{{ route('customer.logout') }}">
-                                    @csrf
-                                    <button class="dropdown-item" type="submit">Logout</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                @else
+@if(auth()->guard('customer')->check())
+    <div class="dropdown">
+        <a class="btn btn-outline-light dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ Auth::guard('customer')->user()->name }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            {{-- PERUBAHAN DI SINI --}}
+            <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
+            {{-- AKHIR PERUBAHAN --}}
+            <li>
+                <form method="POST" action="{{ route('customer.logout') }}">
+                    @csrf
+                    <button class="dropdown-item" type="submit">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+@else
                     <a class="btn btn-outline-light me-2" href="{{ route('customer.login') }}">Login</a>
                     <a class="btn btn-light text-primary" href="{{ route('customer.register') }}">Register</a>
                 @endif
             </div>
         </div>
     </nav>
- </div>
+</div>

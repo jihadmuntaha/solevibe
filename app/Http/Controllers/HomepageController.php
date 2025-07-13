@@ -9,6 +9,7 @@ use App\Models\Product;
 
 use App\Models\Theme;
 use \Binafy\LaravelCart\Models\Cart;
+use \Binafy\LaravelCart\Models\CartItem; // Pastikan ini di-import
 
 class HomepageController extends Controller
 {
@@ -91,7 +92,7 @@ class HomepageController extends Controller
             $products = Product::where('product_category_id',$category->id)->paginate(20);
 
             return view($this->themeFolder.'.category_by_slug', [
-                'slug' => $slug, 
+                'slug' => $slug,
                 'category' => $category,
                 'products' => $products,
             ]);
@@ -102,17 +103,29 @@ class HomepageController extends Controller
 
     public function cart()
     {
-        $cart = Cart::query()
-            ->with(
-                [
-                    'items',
-                    'items.itemable'
-                ]
-            )
-            ->where('user_id', auth()->guard('customer')->user()->id)
-            ->first();
-        
+        $cart = null; // Inisialisasi default
+        if (auth()->guard('customer')->check()) {
+            $cart = Cart::query()
+                ->with(['items', 'items.itemable']) // Eager load itemable
+                ->where('user_id', auth()->guard('customer')->user()->id)
+                ->first();
 
+            // Logika pembersihan item keranjang yang tidak valid
+            $itemsToRemove = [];
+            if ($cart) {
+                foreach ($cart->items as $item) {
+                    if (!$item->itemable) {
+                        $itemsToRemove[] = $item->id;
+                    }
+                }
+            }
+
+            if (!empty($itemsToRemove)) {
+                CartItem::destroy($itemsToRemove);
+                $cart->load('items'); // Muat ulang relasi items setelah penghapusan
+            }
+        }
+        
         return view($this->themeFolder.'.cart',[
             'title'=>'Cart',
             'cart' => $cart,
@@ -121,8 +134,57 @@ class HomepageController extends Controller
 
     public function checkout()
     {
-        return view($this->themeFolder.'.checkout',[
-            'title'=>'Checkout'
-        ]);
+        $title = "Checkout"; // Variabel $title didefinisikan di sini
+
+        $cart = null; // Inisialisasi default
+        $subtotal = 0;
+        $shippingCost = 0;
+        $total = 0;
+        $freeShippingThreshold = 50000; // Definisi ambang batas gratis ongkir
+
+        // Pastikan user login sebelum bisa mengakses keranjang dan checkout
+        if (auth()->guard('customer')->check()) {
+            $cart = Cart::query()
+                ->with(['items', 'items.itemable']) // Eager load itemable
+                ->where('user_id', auth()->guard('customer')->user()->id)
+                ->first();
+
+            // --- LOGIKA PEMBERSIHAN ITEM KERANJANG YANG TIDAK VALID ---
+            $itemsToRemove = [];
+            if ($cart) { // Pastikan $cart tidak null sebelum iterasi item
+                foreach ($cart->items as $item) {
+                    if (!$item->itemable) { // Periksa apakah produk terkait ada
+                        $itemsToRemove[] = $item->id;
+                    }
+                }
+            }
+
+            if (!empty($itemsToRemove)) {
+                CartItem::destroy($itemsToRemove);
+                $cart->load('items'); // Muat ulang relasi items setelah penghapusan
+            }
+            // --- AKHIR LOGIKA PEMBERSIHAN ---
+            
+            // Jika keranjang kosong setelah pembersihan, mungkin redirect atau tampilkan pesan
+            if (!$cart || $cart->items->isEmpty()) {
+                 return redirect()->route('cart.index')->with('error', 'Keranjang belanja Anda kosong. Tidak dapat melanjutkan ke pembayaran.');
+            }
+
+            // Hitung total jika keranjang tidak kosong
+            $subtotal = $cart->calculatedPriceByQuantity();
+            $shippingCost = 5000; // Contoh biaya ongkir
+
+            if ($subtotal >= $freeShippingThreshold) {
+                $shippingCost = 0; // Gratis ongkir
+            }
+            $total = $subtotal + $shippingCost;
+
+        } else {
+            // Jika pengguna tidak login, redirect ke halaman login atau keranjang
+            return redirect()->route('customer.login')->with('error', 'Silakan login untuk melanjutkan ke pembayaran.');
+        }
+
+        // Mengirimkan semua variabel yang diperlukan ke view checkout
+        return view($this->themeFolder.'.checkout', compact('cart', 'subtotal', 'shippingCost', 'total', 'freeShippingThreshold', 'title'));
     }
 }
