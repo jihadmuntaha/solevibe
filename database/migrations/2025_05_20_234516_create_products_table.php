@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->unsigned(); // price: decimal(10,2), >= 0
             $table->integer('stock')->default(0)->unsigned(); // stock: integer, default 0, >= 0
             $table->unsignedBigInteger('product_category_id')->nullable(); // product_category_id: unsignedBigInteger, nullable
+            $table->unsignedBigInteger('hub_product_id')->nullable();
             $table->string('image_url', 255)->nullable(); // image_url: string(255), nullable
             $table->boolean('is_active')->default(true); // is_active: boolean, default true
             $table->timestamps(); // created_at & updated_at

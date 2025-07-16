@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Product;
 use App\Http\Resources\ProductResource;
+use Illuminate\Support\Facades\Http; // Pastikan ini di-import jika Anda menggunakan Http untuk API eksternal
 
 class ProductController extends Controller
 {
@@ -63,7 +64,7 @@ class ProductController extends Controller
 
         return new ProductResource($product, 200, 'Product Details');
     }
-    
+
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -102,12 +103,39 @@ class ProductController extends Controller
 
         return new ProductResource($product, 201, 'Product Updated Successfully');
     }
-    
+
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
         $product->delete();
 
         return response()->json(['success' => true, 'message' => 'Product Deleted Successfully']);
+    }
+    public function sync($id, Request $request)
+    {
+        $product = Product::findOrFail($id);
+
+        $response = Http::post('https://api.phb-umkm.my.id/api/product/sync', [
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
+            'seller_product_id' => (string) $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => $product->price,
+            'stock' => $product->stock,
+            'sku' => $product->sku,
+            'image_url' => $product->image_url,
+            'weight' => $product->weight,
+            'is_active' => $request->is_active == 1 ? false : true,
+            'category_id' => (string) $product->category->hub_category_id,
+        ]);
+
+        if ($response->successful() && isset($response['product_id'])) {
+            $product->hub_product_id = $request->is_active == 1 ? null : $response['product_id'];
+            $product->save();
+        }
+
+        session()->flash('successMessage', 'Product Synced Successfully');
+        return redirect()->back();
     }
 }

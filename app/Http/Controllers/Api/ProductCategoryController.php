@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Categories;
 use App\Http\Resources\ProductCategoryResource;
+use Illuminate\Support\Facades\Http; // Pastikan ini di-import jika Anda menggunakan Http untuk API eksternal
 
 class ProductCategoryController extends Controller
 {
@@ -34,7 +35,7 @@ class ProductCategoryController extends Controller
         $category->name = $request->name;
         $category->slug = $request->slug;
         $category->description = $request->description;
-        
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
@@ -90,5 +91,26 @@ class ProductCategoryController extends Controller
         $category->delete();
 
         return response()->json(['success' => true, 'message' => 'Product Category Deleted Successfully']);
+    }
+    public function sync($id, Request $request)
+    {
+        $category = Categories::findOrFail($id);
+
+        $response = Http::post('https://api.phb-umkm.my.id/api/product-category/sync', [
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
+            'seller_product_category_id' => (string) $category->id,
+            'name' => $category->name,
+            'description' => $category->description,
+            'is_active' => $request->is_active == 1 ? false : true,
+        ]);
+
+        if ($response->successful() && isset($response['product_category_id'])) {
+            $category->hub_category_id = $request->is_active == 1 ? null : $response['product_category_id'];
+            $category->save();
+        }
+
+        session()->flash('successMessage', 'Category Synced Successfully');
+        return redirect()->back();
     }
 }

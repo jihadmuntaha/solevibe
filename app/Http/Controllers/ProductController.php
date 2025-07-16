@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Categories;
 use App\Models\Product;
+use Illuminate\Support\Facades\Http;
+
+
 
 class ProductController extends Controller
 {
@@ -19,9 +22,9 @@ class ProductController extends Controller
         // Mencari produk berdasarkan nama dan deskripsi jika ada pencarian
         $products = Product::when($q, function ($query, $q) {
             return $query->where('name', 'like', "%{$q}%")
-                         ->orWhere('description', 'like', "%{$q}%");
+                ->orWhere('description', 'like', "%{$q}%");
         })->paginate(10); // Menampilkan hasil produk dengan pagination
-        
+
         return view('dashboard.products.index', compact('products', 'q'));
     }
 
@@ -31,7 +34,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Categories::all();
-        return view('dashboard.products.create', compact('categories')); 
+        return view('dashboard.products.create', compact('categories'));
     }
 
     /**
@@ -168,5 +171,33 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('successMessage', 'Data Berhasil Dihapus');
+    }
+
+    public function sync($id, Request $request)
+    {
+        $product = Product::findOrFail($id);
+
+        $response = Http::post('https://api.phb-umkm.my.id/api/product/sync', [
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
+            'seller_product_id' => (string) $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => $product->price,
+            'stock' => $product->stock,
+            'sku' => $product->sku,
+            'image_url' => $product->image_url,
+            'weight' => $product->weight,
+            'is_active' => $request->is_active == 1 ? false : true,
+            'category_id' => (string) $product->category->hub_category_id,
+        ]);
+
+        if ($response->successful() && isset($response['product_id'])) {
+            $product->hub_product_id = $request->is_active == 1 ? null : $response['product_id'];
+            $product->save();
+        }
+
+        session()->flash('successMessage', 'Product Synced Successfully');
+        return redirect()->back();
     }
 }

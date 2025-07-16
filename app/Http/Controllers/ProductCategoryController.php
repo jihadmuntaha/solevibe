@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Categories;
+use Illuminate\Support\Facades\Http;
+
+
 
 class ProductCategoryController extends Controller
 {
@@ -15,7 +18,7 @@ class ProductCategoryController extends Controller
         $categories = Categories::query()
             ->when($request->filled('q'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->q . '%')
-                      ->orWhere('description', 'like', '%' . $request->q . '%');
+                    ->orWhere('description', 'like', '%' . $request->q . '%');
             })
             ->paginate(10);
 
@@ -54,8 +57,8 @@ class ProductCategoryController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->with(
                 [
-                    'errors'=>$validator->errors(),
-                    'errorMessage'=>'Validasi Error, Silahkan lengkapi data terlebih dahulu'
+                    'errors' => $validator->errors(),
+                    'errorMessage' => 'Validasi Error, Silahkan lengkapi data terlebih dahulu'
                 ]
             );
         }
@@ -64,7 +67,7 @@ class ProductCategoryController extends Controller
         $category->name = $request->name;
         $category->slug = $request->slug;
         $category->description = $request->description;
-        
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
@@ -77,7 +80,7 @@ class ProductCategoryController extends Controller
         return redirect()->back()
             ->with(
                 [
-                    'successMessage'=>'Data Berhasil Disimpan'
+                    'successMessage' => 'Data Berhasil Disimpan'
                 ]
             );
     }
@@ -97,8 +100,8 @@ class ProductCategoryController extends Controller
     {
         $category = Categories::find($id);
 
-        return view('dashboard.categories.edit',[
-            'category'=>$category
+        return view('dashboard.categories.edit', [
+            'category' => $category
         ]);
     }
 
@@ -123,8 +126,8 @@ class ProductCategoryController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->with(
                 [
-                    'errors'=>$validator->errors(),
-                    'errorMessage'=>'Validasi Error, Silahkan lengkapi data terlebih dahulu'
+                    'errors' => $validator->errors(),
+                    'errorMessage' => 'Validasi Error, Silahkan lengkapi data terlebih dahulu'
                 ]
             );
         }
@@ -146,7 +149,7 @@ class ProductCategoryController extends Controller
         return redirect()->back()
             ->with(
                 [
-                    'successMessage'=>'Data Berhasil Disimpan'
+                    'successMessage' => 'Data Berhasil Disimpan'
                 ]
             );
     }
@@ -163,8 +166,30 @@ class ProductCategoryController extends Controller
         return redirect()->back()
             ->with(
                 [
-                    'successMessage'=>'Data Berhasil Dihapus'
+                    'successMessage' => 'Data Berhasil Dihapus'
                 ]
             );
     }
+    // public function sync($id, Request $request)
+    // {
+    //     $category = Categories::findOrFail($id);
+
+    //     $response = Http::post('https://api.phb-umkm.my.id/api/product-category', [
+    //         'client_id' => env('CLIENT_ID'),
+    //         'client_secret' => env('CLIENT_SECRET'),
+    //         'seller_product_category_id' => (string) $category->id,
+    //         'name' => $category->name,
+    //         'description' => $category->description,
+    //         'is_active' => $request->is_active == 1 ? false : true,
+    //     ]);
+
+    //     if ($response->successful() && isset($response['product_category_id'])) {
+    //         $category->hub_category_id = $request->is_active == 1 ? null : $response['product_category_id'];
+    //         $category->save();
+    //     }
+
+    //     session()->flash('successMessage', 'Category Synced Successfully');
+    //     return redirect()->back();
+    // }
+
 }

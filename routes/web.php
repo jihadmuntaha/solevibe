@@ -33,7 +33,7 @@ use App\Http\Controllers\ApiController;
 Route::get('/', [HomepageController::class, 'index'])->name('home');
 Route::get('products', [HomepageController::class, 'products']);
 Route::get('product/{slug}', [HomepageController::class, 'product'])->name('product.show');
-Route::get('categories',[HomepageController::class, 'categories']);
+Route::get('categories', [HomepageController::class, 'categories']);
 Route::get('category/{slug}', [HomepageController::class, 'category']);
 
 // Cart dan Checkout (GET - untuk menampilkan halaman)
@@ -42,7 +42,7 @@ Route::get('cart', [HomepageController::class, 'cart'])->name('cart.index');
 Route::get('checkout', [HomepageController::class, 'checkout'])->name('checkout.index');
 
 // --- Routes yang Membutuhkan Login Customer ---
-Route::group(['middleware' => ['is_customer_login']], function() {
+Route::group(['middleware' => ['is_customer_login']], function () {
 
     // Cart Actions (POST, DELETE, PATCH)
     Route::controller(CartController::class)->group(function () {
@@ -60,32 +60,32 @@ Route::group(['middleware' => ['is_customer_login']], function() {
 });
 
 // --- Customer Authentication Routes ---
-Route::group(['prefix' => 'customer'], function() {
-    Route::controller(CustomerAuthController::class)->group(function(){
-        Route::group(['middleware' => 'check_customer_login'], function(){
+Route::group(['prefix' => 'customer'], function () {
+    Route::controller(CustomerAuthController::class)->group(function () {
+        Route::group(['middleware' => 'check_customer_login'], function () {
             // Tampilkan halaman login
-            Route::get('login','login')->name('customer.login');
+            Route::get('login', 'login')->name('customer.login');
             // Aksi login
-            Route::post('login','store_login')->name('customer.store_login');
+            Route::post('login', 'store_login')->name('customer.store_login');
             // Tampilkan halaman register
-            Route::get('register','register')->name('customer.register');
+            Route::get('register', 'register')->name('customer.register');
             // Aksi register
-            Route::post('register','store_register')->name('customer.store_register');
+            Route::post('register', 'store_register')->name('customer.store_register');
         });
-        
+
         // Aksi logout
-        Route::post('logout','logout')->name('customer.logout');
+        Route::post('logout', 'logout')->name('customer.logout');
     });
 });
 
 // --- Dashboard / Admin Routes (Membutuhkan login admin/user) ---
-Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function(){
-    Route::get('/',[DashboardController::class,'index'])->name('dashboard');
+Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('categories', ProductCategoryController::class);
     Route::resource('products', ProductController::class);
     Route::resource('themes', ThemeController::class);
-    
+
     // --- PERBAIKAN PENEMPATAN RUTE ORDERS DI SINI ---
     Route::resource('orders', OrderController::class); // Ini akan membuat index, create, store, show, edit, update, destroy
     // Jika Anda ingin rute updateStatus terpisah, Anda bisa menambahkannya setelah resource
@@ -93,6 +93,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     // --- AKHIR PERBAIKAN ---
 
     // Tambahkan resource atau rute lain untuk dashboard di sini
+    Route::post('products/sync/{id}', [ProductController::class, 'sync'])->name('products.sync');
+    Route::post('category/sync/{id}', [ProductCategoryController::class, 'sync'])->name('category.sync');
 });
 
 // --- Settings Routes (Menggunakan Volt, membutuhkan login user) ---
@@ -105,4 +107,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // --- Auth Routes Laravel Breeze/Jetstream (jika digunakan) ---
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

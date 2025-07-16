@@ -29,47 +29,58 @@
         <table class="min-w-full leading-normal">
             <thead>
                 <tr>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         ID
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Image
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Name
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Category
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         SKU
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         PRICE
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Active
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Created At
                     </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th
+                        class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Actions
                     </th>
+                    <th>On/Off</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $key=>$product)
+                @foreach($products as $key => $product)
                     <tr>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p class="text-gray-900 whitespace-no-wrap">
-                                {{ $key+1 }}
+                                {{ $key + 1 }}
                             </p>
                         </td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                             <p class="text-gray-900 whitespace-no-wrap">
                                 @if($product->image_url)
-                                   <img src="{{ Storage::url($product->image_url) }}" alt="{{ $product->name }}" class="h-10 w-10 object-cover rounded">
+                                    <img src="{{ Storage::url($product->image_url) }}" alt="{{ $product->name }}"
+                                        class="h-10 w-10 object-cover rounded">
                                 @else
                                     <div class="h-10 w-10 bg-gray-200 flex items-center justify-center rounded">
                                         <span class="text-gray-500 text-sm">N/A</span>
@@ -111,14 +122,33 @@
                             <flux:dropdown>
                                 <flux:button icon:trailing="chevron-down">Actions</flux:button>
                                 <flux:menu>
-                                    <flux:menu.item icon="pencil" href="{{ route('products.edit', $product->id) }}">Edit</flux:menu.item>
-                                    <flux:menu.item icon="trash" variant="danger" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this product?')) document.getElementById('delete-form-{{ $product->id }}').submit();">Delete</flux:menu.item>
-                                    <form id="delete-form-{{ $product->id }}" action="{{ route('products.destroy', $product->id) }}" method="POST">
+                                    <flux:menu.item icon="pencil" href="{{ route('products.edit', $product->id) }}">Edit
+                                    </flux:menu.item>
+                                    <flux:menu.item icon="trash" variant="danger"
+                                        onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this product?')) document.getElementById('delete-form-{{ $product->id }}').submit();">
+                                        Delete</flux:menu.item>
+                                    <form id="delete-form-{{ $product->id }}"
+                                        action="{{ route('products.destroy', $product->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                     </form>
                                 </flux:menu>
                             </flux:dropdown>
+                        </td>
+                        <td>
+                            <form id="sync-product-{{ $product->id }}" action="{{ route('products.sync', $product->id) }}"
+                                method="POST">
+                                @csrf
+                                <input type="hidden" name="is_active"
+                                    value="@if($product->hub_product_id) 1 @else 0 @endif">
+                                @if($product->hub_product_id)
+                                    <flux:switch checked
+                                        onchange="document.getElementById('sync-product-{{ $product->id }}').submit()" />
+                                @else
+                                    <flux:switch
+                                        onchange="document.getElementById('sync-product-{{ $product->id }}').submit()" />
+                                @endif
+                            </form>
                         </td>
                     </tr>
                 @endforeach
